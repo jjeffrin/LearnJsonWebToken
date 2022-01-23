@@ -1,0 +1,25 @@
+﻿@page "/profile"
+@using LearnJsonWebToken.Client.Utility
+@attribute [Authorize]
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authState
+@inject NavigationManager navigationManager
+
+<h3>Profile</h3>
+
+<p>Email Id: @UserState.Email</p>
+<p>User Id: @UserState.Uid</p>
+
+<button @onclick="Logout">Logout</button>
+
+@code {
+
+	private async void Logout()
+	{
+		await this.localStorage.RemoveItemAsync("access_token");
+		await this.authState.GetAuthenticationStateAsync();
+		// this.StateHasChanged();
+		this.navigationManager.NavigateTo("auth");
+	}
+
+}

@@ -1,0 +1,38 @@
+﻿@page "/auth"
+@inject HttpClient httpClient
+@inject ILocalStorageService localStorage
+@inject AuthenticationStateProvider authState
+@inject NavigationManager navigationManager
+
+<h3>Auth</h3>
+
+<h4>Login Form</h4>
+<input type="text" name="Email" @bind-value="emailId" />
+<input type="password" name="Password" @bind-value="password" />
+<button @onclick="LoginUser">Login</button>
+
+@code {
+
+	private string emailId = string.Empty;
+	private string password = string.Empty;
+	private string errorMessage = string.Empty;
+
+	private async void LoginUser()
+	{
+		var response = await this.httpClient
+		.PostAsJsonAsync("api/Auth/login", new { Email = emailId, Password = password });
+		if (response.IsSuccessStatusCode)
+		{
+			var tokenAsString = await response.Content.ReadAsStringAsync();
+			await this.localStorage.SetItemAsStringAsync("access_token", tokenAsString);
+			await this.authState.GetAuthenticationStateAsync();
+			// this.StateHasChanged();
+			this.navigationManager.NavigateTo("/counter");
+		}
+		else
+		{
+			errorMessage = "There is some issue";
+		}
+	}
+
+}
